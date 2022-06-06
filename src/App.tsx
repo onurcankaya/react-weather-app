@@ -14,7 +14,6 @@ import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Spinner from 'react-bootstrap/Spinner';
 import Tooltip from 'react-bootstrap/Tooltip';
 
-import styles from './App.scss';
 import {
   capitalize,
   convertCelsiusToFahrenheit,
@@ -124,18 +123,11 @@ export function App(): JSX.Element | null {
     [fetchLocationData],
   );
 
-  const renderWeatherCard = useMemo(() => {
+  const renderWeatherResult = useMemo(() => {
     if (!weather) {
       if (isLoading) {
         return (
-          <Container
-            style={{
-              height: '40vh',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
+          <Container className="flex justify-center items-center h-screen">
             <Spinner animation="border" role="status">
               <span className="visually-hidden" />
             </Spinner>
@@ -159,32 +151,31 @@ export function App(): JSX.Element | null {
     return (
       <>
         <Container>
-          <Form onSubmit={handleSubmitQuery} style={{ margin: '1em 0' }}>
+          <Form onSubmit={handleSubmitQuery} className="my-3">
             <FormControl
               type="search"
               placeholder="Search for a location..."
               aria-label="Search"
               onChange={handleChangeQuery}
+              className="bg-stone-50"
             />
           </Form>
         </Container>
         <Container>
           {status && <Alert variant="danger">{status}</Alert>}
-          <Card className={styles.card}>
+          <Card className="my-3 bg-stone-50">
             <Card.Body>
               <Card.Title>{location}</Card.Title>
-              <Card.Text>
+              <Card.Text className="flex items-center">
                 <Image
                   src={`https://openweathermap.org/img/wn/${icon}@2x.png`}
                 />
-                <span
-                  style={{ fontSize: '1.5em' }}
-                >{`${temperatureCelsius}°C / ${temperatureFahrenheit}°F`}</span>
+                <span className="text-2xl">{`${temperatureCelsius}°C / ${temperatureFahrenheit}°F`}</span>
               </Card.Text>
-              <Card.Text>{description}</Card.Text>
-              <Card.Text>{`Humidity: ${humidity}%`}</Card.Text>
-              <Card.Text>{`Sunrise: ${sunrise}`}</Card.Text>
-              <Card.Text>{`Sunset: ${sunset}`}</Card.Text>
+              <Card.Text className="pb-2 text-base">{description}</Card.Text>
+              <Card.Text className="pb-2 text-base">{`Humidity: ${humidity}%`}</Card.Text>
+              <Card.Text className="pb-2 text-base">{`Sunrise: ${sunrise}`}</Card.Text>
+              <Card.Text className="pb-2 text-base">{`Sunset: ${sunset}`}</Card.Text>
             </Card.Body>
           </Card>
         </Container>
@@ -196,7 +187,9 @@ export function App(): JSX.Element | null {
     <>
       <Navbar bg="dark" variant="dark" expand="lg">
         <Container>
-          <Navbar.Brand>React Weather App</Navbar.Brand>
+          <Navbar.Brand className="text-slate-200">
+            React Weather App
+          </Navbar.Brand>
           <OverlayTrigger
             placement="bottom"
             overlay={<Tooltip>See code on Github</Tooltip>}
@@ -205,13 +198,14 @@ export function App(): JSX.Element | null {
               href="https://github.com/onurcankaya/react-weather-app"
               target="_blank"
               rel="noopener"
+              className="text-slate-200"
             >
               <FontAwesomeIcon icon={githubIcon} size="2x" />
             </Nav.Link>
           </OverlayTrigger>
         </Container>
       </Navbar>
-      {renderWeatherCard}
+      {renderWeatherResult}
     </>
   );
 }
