@@ -1,7 +1,7 @@
 import { IconProp } from '@fortawesome/fontawesome-svg-core';
 import { faGithub } from '@fortawesome/free-brands-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import Alert from 'react-bootstrap/Alert';
 import Card from 'react-bootstrap/Card';
 import Container from 'react-bootstrap/Container';
@@ -11,6 +11,7 @@ import Image from 'react-bootstrap/Image';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
+import Spinner from 'react-bootstrap/Spinner';
 import Tooltip from 'react-bootstrap/Tooltip';
 
 import styles from './App.scss';
@@ -40,6 +41,7 @@ export function App(): JSX.Element | null {
   const [weather, setWeather] = useState<Weather | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [query, setQuery] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
 
   const fetchWeatherData = async (
     latitude: number,
@@ -66,7 +68,7 @@ export function App(): JSX.Element | null {
     } catch (error) {
       let message = 'Unknown Error';
       if (error instanceof Error) {
-        message = 'Unable to fetch weather data.';
+        message = 'Unable to fetch weather data';
       }
       setStatus(message);
     }
@@ -79,6 +81,7 @@ export function App(): JSX.Element | null {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           setStatus(null);
+          setIsLoading(false);
           fetchWeatherData(position.coords.latitude, position.coords.longitude);
         },
         () => {
@@ -88,7 +91,7 @@ export function App(): JSX.Element | null {
     }
   }, []);
 
-  const fetchLocationData = async (): Promise<void> => {
+  const fetchLocationData = useCallback(async (): Promise<void> => {
     try {
       const URL_BASE = `https://api.mapbox.com/geocoding/v5/mapbox.places/`;
       const URL = `${URL_BASE}${query}.json?access_token=${MAPBOX_API_KEY}`;
@@ -107,29 +110,87 @@ export function App(): JSX.Element | null {
       }
       setStatus(message);
     }
-  };
+  }, [query]);
 
   const handleChangeQuery = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setQuery(e.target.value);
   };
 
-  const handleSubmitQuery = (e: React.FormEvent<HTMLFormElement>): void => {
-    e.preventDefault();
-    fetchLocationData();
-  };
+  const handleSubmitQuery = useCallback(
+    (e: React.FormEvent<HTMLFormElement>): void => {
+      e.preventDefault();
+      fetchLocationData();
+    },
+    [fetchLocationData],
+  );
 
-  if (!weather) return null;
+  const renderWeatherCard = useMemo(() => {
+    if (!weather) {
+      if (isLoading) {
+        return (
+          <Container
+            style={{
+              height: '40vh',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Spinner animation="border" role="status">
+              <span className="visually-hidden" />
+            </Spinner>
+          </Container>
+        );
+      }
+      return null;
+    }
 
-  const {
-    location,
-    temperatureFahrenheit,
-    temperatureCelsius,
-    description,
-    icon,
-    humidity,
-    sunrise,
-    sunset,
-  } = weather;
+    const {
+      location,
+      temperatureFahrenheit,
+      temperatureCelsius,
+      description,
+      icon,
+      humidity,
+      sunrise,
+      sunset,
+    } = weather;
+
+    return (
+      <>
+        <Container>
+          <Form onSubmit={handleSubmitQuery} style={{ margin: '1em 0' }}>
+            <FormControl
+              type="search"
+              placeholder="Search for a location..."
+              aria-label="Search"
+              onChange={handleChangeQuery}
+            />
+          </Form>
+        </Container>
+        <Container>
+          {status && <Alert variant="danger">{status}</Alert>}
+          <Card className={styles.card}>
+            <Card.Body>
+              <Card.Title>{location}</Card.Title>
+              <Card.Text>
+                <Image
+                  src={`https://openweathermap.org/img/wn/${icon}@2x.png`}
+                />
+                <span
+                  style={{ fontSize: '1.5em' }}
+                >{`${temperatureCelsius}°C / ${temperatureFahrenheit}°F`}</span>
+              </Card.Text>
+              <Card.Text>{description}</Card.Text>
+              <Card.Text>{`Humidity: ${humidity}%`}</Card.Text>
+              <Card.Text>{`Sunrise: ${sunrise}`}</Card.Text>
+              <Card.Text>{`Sunset: ${sunset}`}</Card.Text>
+            </Card.Body>
+          </Card>
+        </Container>
+      </>
+    );
+  }, [weather, isLoading, status, handleSubmitQuery]);
 
   return (
     <>
@@ -150,34 +211,7 @@ export function App(): JSX.Element | null {
           </OverlayTrigger>
         </Container>
       </Navbar>
-      <Container>
-        <Form onSubmit={handleSubmitQuery} style={{ margin: '1em 0' }}>
-          <FormControl
-            type="search"
-            placeholder="Search for a location..."
-            aria-label="Search"
-            onChange={handleChangeQuery}
-          />
-        </Form>
-      </Container>
-      <Container>
-        {status && <Alert variant="danger">{status}</Alert>}
-        <Card className={styles.card}>
-          <Card.Body>
-            <Card.Title>{location}</Card.Title>
-            <Card.Text>
-              <Image src={`https://openweathermap.org/img/wn/${icon}@2x.png`} />
-              <span
-                style={{ fontSize: '1.5em' }}
-              >{`${temperatureCelsius}°C / ${temperatureFahrenheit}°F`}</span>
-            </Card.Text>
-            <Card.Text>{description}</Card.Text>
-            <Card.Text>{`Humidity: ${humidity}%`}</Card.Text>
-            <Card.Text>{`Sunrise: ${sunrise}`}</Card.Text>
-            <Card.Text>{`Sunset: ${sunset}`}</Card.Text>
-          </Card.Body>
-        </Card>
-      </Container>
+      {renderWeatherCard}
     </>
   );
 }
