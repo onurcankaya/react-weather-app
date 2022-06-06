@@ -128,7 +128,11 @@ export function App(): JSX.Element | null {
       if (isLoading) {
         return (
           <Container className="flex justify-center items-center h-screen">
-            <Spinner animation="border" role="status">
+            <Spinner
+              animation="border"
+              role="status"
+              className="text-stone-100"
+            >
               <span className="visually-hidden" />
             </Spinner>
           </Container>
@@ -157,13 +161,13 @@ export function App(): JSX.Element | null {
               placeholder="Search for a location..."
               aria-label="Search"
               onChange={handleChangeQuery}
-              className="bg-stone-50"
+              className="bg-stone-100"
             />
           </Form>
         </Container>
         <Container>
           {status && <Alert variant="danger">{status}</Alert>}
-          <Card className="my-3 bg-stone-50">
+          <Card className="my-3 bg-stone-100">
             <Card.Body>
               <Card.Title>{location}</Card.Title>
               <Card.Text className="flex items-center">
@@ -185,7 +189,7 @@ export function App(): JSX.Element | null {
 
   return (
     <>
-      <Navbar bg="dark" variant="dark" expand="lg">
+      <Navbar variant="dark" expand="lg" className="mb-2 bg-slate-900">
         <Container>
           <Navbar.Brand className="text-slate-200">
             React Weather App
