@@ -1,6 +1,6 @@
 ## React Weather App
 
-Weather forecast app built with React, Typescript, Geolocation API, OpenWeatherMap API & MapBox API
+Weather forecast app built with React, TypeScript, Geolocation API, OpenWeatherMap API & MapBox API
 
 ### Install dependencies
 

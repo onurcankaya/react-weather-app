@@ -97,6 +97,7 @@ export function App(): JSX.Element | null {
       const latitude = data.features[0].geometry.coordinates[1];
       const longitude = data.features[0].geometry.coordinates[0];
       const location = data.features[0].place_name;
+      setStatus(null);
       fetchWeatherData(latitude, longitude, location);
     } catch (error) {
       let message = 'Unknown Error';
