@@ -3,7 +3,7 @@ export const convertCelsiusToFahrenheit = (celsius: number): number => {
   return Math.floor(fahrenheit);
 };
 
-export const convertEpochToHumanReadable = (timestamp: number): Date => {
+export const convertEpochToHumanReadableTime = (timestamp: number): Date => {
   return new Date(timestamp * 1000);
 };
 
