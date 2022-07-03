@@ -32,8 +32,8 @@ type Weather = {
   description: string;
   icon: string;
   humidity: number;
-  sunrise: Date;
-  sunset: Date;
+  sunrise: string;
+  sunset: string;
 };
 
 export function App(): JSX.Element | null {
@@ -169,17 +169,21 @@ export function App(): JSX.Element | null {
           {status && <Alert variant="danger">{status}</Alert>}
           <Card className="my-3 bg-stone-100">
             <Card.Body>
-              <Card.Title>{location}</Card.Title>
-              <Card.Text className="flex items-center">
-                <Image
-                  src={`https://openweathermap.org/img/wn/${icon}@2x.png`}
-                />
-                <span className="text-2xl">{`${temperatureCelsius}°C / ${temperatureFahrenheit}°F`}</span>
+              <Card.Title className="mb-4 font-semibold">{location}</Card.Title>
+              <Card.Text className="flex items-center mb-4">
+                <div className="bg-slate-300 rounded-md mr-8">
+                  <Image
+                    src={`https://openweathermap.org/img/wn/${icon}@2x.png`}
+                  />
+                </div>
+                <span className="text-5xl font-semibold">{`${temperatureCelsius}°C / ${temperatureFahrenheit}°F`}</span>
               </Card.Text>
-              <Card.Text className="pb-2 text-base">{description}</Card.Text>
-              <Card.Text className="pb-2 text-base">{`Humidity: ${humidity}%`}</Card.Text>
-              <Card.Text className="pb-2 text-base">{`Sunrise: ${sunrise}`}</Card.Text>
-              <Card.Text className="pb-2 text-base">{`Sunset: ${sunset}`}</Card.Text>
+              <Card.Text className="mb-3 font-semibold">
+                {description}
+              </Card.Text>
+              <Card.Text className="mb-3 font-semibold">{`Humidity — ${humidity}%`}</Card.Text>
+              <Card.Text className="mb-3 font-semibold">{`Sunrise — ${sunrise}AM`}</Card.Text>
+              <Card.Text className="mb-3 font-semibold">{`Sunset — ${sunset}PM`}</Card.Text>
             </Card.Body>
           </Card>
         </Container>

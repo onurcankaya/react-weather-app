@@ -3,8 +3,11 @@ export const convertCelsiusToFahrenheit = (celsius: number): number => {
   return Math.floor(fahrenheit);
 };
 
-export const convertEpochToHumanReadableTime = (timestamp: number): Date => {
-  return new Date(timestamp * 1000);
+export const convertEpochToHumanReadableTime = (timestamp: number): string => {
+  const date = new Date(timestamp * 1000);
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+  return `${hours > 12 ? hours - 12 : hours}:${minutes}`;
 };
 
 export const capitalize = (word: string): string => {
