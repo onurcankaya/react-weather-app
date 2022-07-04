@@ -17,6 +17,7 @@ import Tooltip from 'react-bootstrap/Tooltip';
 import {
   capitalize,
   convertCelsiusToFahrenheit,
+  convertEpochToHumanReadableDate,
   convertEpochToHumanReadableTime,
 } from './utils';
 
@@ -25,16 +26,18 @@ const MAPBOX_API_KEY = process.env.REACT_APP_MAPBOX_API_KEY;
 
 const githubIcon = faGithub as IconProp;
 
-type Weather = {
+interface Weather {
   location: string;
   temperatureFahrenheit: number;
   temperatureCelsius: number;
   description: string;
   icon: string;
   humidity: number;
+  date: string;
   sunrise: string;
   sunset: string;
-};
+  wind: string;
+}
 
 export function App(): JSX.Element | null {
   const [weather, setWeather] = useState<Weather | null>(null);
@@ -60,8 +63,10 @@ export function App(): JSX.Element | null {
         description: capitalize(data.current.weather[0].description),
         icon: data.current.weather[0].icon,
         humidity: data.current.humidity,
+        date: convertEpochToHumanReadableDate(data.current.dt),
         sunrise: convertEpochToHumanReadableTime(data.current.sunrise),
         sunset: convertEpochToHumanReadableTime(data.current.sunset),
+        wind: data.current.wind_speed,
       };
       setWeather(weatherData);
     } catch (error) {
@@ -148,28 +153,31 @@ export function App(): JSX.Element | null {
       description,
       icon,
       humidity,
+      date,
       sunrise,
       sunset,
+      wind,
     } = weather;
 
     return (
       <>
         <Container>
-          <Form onSubmit={handleSubmitQuery} className="my-3">
+          <Form onSubmit={handleSubmitQuery} className="mb-3">
             <FormControl
               type="search"
               placeholder="Search for a location..."
               aria-label="Search"
               onChange={handleChangeQuery}
-              className="bg-stone-100"
+              className="bg-stone-100 pl-4"
             />
           </Form>
         </Container>
         <Container>
           {status && <Alert variant="danger">{status}</Alert>}
           <Card className="my-3 bg-stone-100">
-            <Card.Body>
-              <Card.Title className="mb-4 font-semibold">{location}</Card.Title>
+            <Card.Body className="p-4">
+              <Card.Title className="mb-2 font-semibold">{location}</Card.Title>
+              <Card.Text className="mb-4 font-semibold">{date}</Card.Text>
               <Card.Text className="flex items-center mb-4">
                 <div className="bg-slate-300 rounded-md mr-8">
                   <Image
@@ -178,12 +186,13 @@ export function App(): JSX.Element | null {
                 </div>
                 <span className="text-5xl font-semibold">{`${temperatureCelsius}°C / ${temperatureFahrenheit}°F`}</span>
               </Card.Text>
-              <Card.Text className="mb-3 font-semibold">
+              <Card.Text className="mb-2 font-semibold">
                 {description}
               </Card.Text>
-              <Card.Text className="mb-3 font-semibold">{`Humidity — ${humidity}%`}</Card.Text>
-              <Card.Text className="mb-3 font-semibold">{`Sunrise — ${sunrise}AM`}</Card.Text>
-              <Card.Text className="mb-3 font-semibold">{`Sunset — ${sunset}PM`}</Card.Text>
+              <Card.Text className="mb-1 text-sm">{`Humidity — ${humidity}%`}</Card.Text>
+              <Card.Text className="mb-1 text-sm">{`Wind — ${wind} m/s`}</Card.Text>
+              <Card.Text className="mb-1 text-sm">{`Sunrise — ${sunrise} AM`}</Card.Text>
+              <Card.Text className="mb-1 text-sm">{`Sunset — ${sunset} PM`}</Card.Text>
             </Card.Body>
           </Card>
         </Container>
@@ -193,7 +202,7 @@ export function App(): JSX.Element | null {
 
   return (
     <>
-      <Navbar variant="dark" expand="lg" className="mb-2 bg-slate-900">
+      <Navbar variant="dark" expand="lg" className="bg-slate-900 py-3">
         <Container>
           <Navbar.Brand className="text-slate-200">
             React Weather App
